@@ -48,7 +48,11 @@ def load_and_process_building(file_path: str, consumption_col: str) -> pd.DataFr
     df = pd.read_parquet(file_path)
 
     temp_timeseries = df[
-        ["timestamp", "out.zone_mean_air_temp.conditioned_space.c", consumption_col]
+        [
+            "timestamp",
+            "out.zone_mean_air_temp.conditioned_space.c",
+            consumption_col,
+        ]
     ].copy()
 
     temp_timeseries.columns = ["timestamp", "indoor_temp", "consumption"]
@@ -56,9 +60,13 @@ def load_and_process_building(file_path: str, consumption_col: str) -> pd.DataFr
     return temp_timeseries
 
 
-def load_and_process_all_buildings(resstock: pd.DataFrame) -> pd.DataFrame:
+def load_and_process_all_buildings(resstock: pd.DataFrame, tanda: int) -> pd.DataFrame:
     """
     Loads and processes all files in the 'data/buildings' directory.
+
+    Args:
+        resstock (pd.DataFrame): The ResStock dataset containing building information.
+        tanda (int): An integer indicating which subset of buildings to process.
 
     Returns:
         pd.DataFrame: A DataFrame containing the processed data from all buildings.
@@ -67,11 +75,58 @@ def load_and_process_all_buildings(resstock: pd.DataFrame) -> pd.DataFrame:
 
     path = "/Users/adrian/Documents/ICAI/4o/AI Lab/data/buildings"
 
+    lower_limit = 0
+    upper_limit = 0
+
+    match tanda:
+        case 0:
+            lower_limit = 0
+            upper_limit = 1000
+        case 1:
+            lower_limit = 1000
+            upper_limit = 2000
+        case 2:
+            lower_limit = 2000
+            upper_limit = 3000
+        case 3:
+            lower_limit = 3000
+            upper_limit = 4000
+        case 4:
+            lower_limit = 4000
+            upper_limit = 5000
+        case 5:
+            lower_limit = 5000
+            upper_limit = 6000
+        case 6:
+            lower_limit = 6000
+            upper_limit = 7000
+        case 7:
+            lower_limit = 7000
+            upper_limit = 8000
+        case 8:
+            lower_limit = 8000
+            upper_limit = 9000
+        case 9:
+            lower_limit = 9000
+            upper_limit = 10000
+        case 10:
+            lower_limit = 10000
+            upper_limit = 11000
+        case 11:
+            lower_limit = 11000
+            upper_limit = len(os.listdir(path))
+
     i = 0
     for file in os.listdir(path):
+
+        if i < lower_limit or i >= upper_limit:
+            i += 1
+            continue
+
         i += 1
+
         print(
-            f"Processing file {i}/{len(os.listdir(path))}                  ",
+            f"Processing file {i}/{upper_limit}                  ",
             end="\r",
         )
         if file.endswith(".parquet"):
@@ -80,6 +135,32 @@ def load_and_process_all_buildings(resstock: pd.DataFrame) -> pd.DataFrame:
             building_data = load_and_process_building(
                 os.path.join(path, file), consumption_col
             )
+            all_buildings_data = pd.concat(
+                [all_buildings_data, building_data], ignore_index=False
+            )
+
+    return all_buildings_data
+
+
+def merge_building_data() -> pd.DataFrame:
+    """
+    Merge all building data from the 'data/processed_buildings' directory into a single DataFrame.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the merged building data.
+    """
+    path = "/Users/adrian/Documents/ICAI/4o/AI Lab/data/processed_buildings"
+    all_buildings_data = pd.DataFrame()
+
+    i = 0
+    for file in os.listdir(path):
+        i += 1
+        print(
+            f"Processing file {i}/{len(os.listdir(path))}                  ",
+            end="\r",
+        )
+        if file.endswith(".csv"):
+            building_data = pd.read_csv(os.path.join(path, file))
             all_buildings_data = pd.concat(
                 [all_buildings_data, building_data], ignore_index=True
             )

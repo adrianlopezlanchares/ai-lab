@@ -1,8 +1,6 @@
 /.env
 /data
 **/__pycache__/
-/runs
-/models
 
 .DS_Store
 prueba.ipynb

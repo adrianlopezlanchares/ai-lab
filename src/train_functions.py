@@ -37,7 +37,9 @@ def train_mlp(model, train_loader, criterion, optimizer, device, epochs=1, write
             total_loss += loss.item()
 
             if writer:
-                writer.add_scalar("Loss/train", loss.item(), epoch)
+                writer.add_scalar(
+                    "Loss/train", loss.item(), step + len(train_loader) * (epoch)
+                )
 
     return total_loss / len(train_loader)
 

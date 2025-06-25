@@ -158,7 +158,10 @@ def main():
     parameters = {}
     building_data_path = "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_data"
     for file in os.listdir(building_data_path):
-        print(f"Processing file {i}/{len(os.listdir(building_data_path))}")
+        print(
+            f"Processing file {i}/{len(os.listdir(building_data_path))}           ",
+            end="\r",
+        )
         i += 1
 
         if file.endswith(".parquet"):

@@ -256,6 +256,8 @@ def process_resstock_data(df: pd.DataFrame) -> pd.DataFrame:
     df = _process_heating_targets(df)
     df = _process_cooling_targets(df)
 
+    df = df[COLUMNS_PROCESSED]
+
     return df
 
 

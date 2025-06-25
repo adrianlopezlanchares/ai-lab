@@ -21,7 +21,12 @@ def train_mlp(model, train_loader, criterion, optimizer, device, epochs=1, write
     model.train()
     total_loss = 0.0
     for epoch in range(epochs):
+        step = 0
         for data, labels in train_loader:
+            print(
+                f"Epoch {epoch + 1}/{epochs}, Step {step + 1}/{len(train_loader)}         ",
+                end="\r",
+            )
             data, labels = data.to(device), labels.to(device)
             optimizer.zero_grad()
             outputs = model(data).squeeze()

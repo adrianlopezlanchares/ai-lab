@@ -13,6 +13,10 @@ from dataset import Dataset
 from models import LinearRegressionModel
 from train_functions import train
 
+import warnings
+
+warnings.filterwarnings("ignore")
+
 
 def process_weather_data(weather: pd.DataFrame) -> pd.DataFrame:
     """

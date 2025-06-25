@@ -11,7 +11,7 @@ def train(model, train_loader, criterion, optimizer, num_epochs):
             optimizer.zero_grad()
 
             # Forward pass
-            outputs = model(sequences)
+            outputs = model(sequences).squeeze()
             loss = criterion(outputs, labels)  # Unsqueeze labels to match output dim
 
             # Backward pass and optimization

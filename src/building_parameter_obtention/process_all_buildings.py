@@ -24,22 +24,18 @@ def process_weather_data(weather: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Processed weather data with relevant features.
     """
-    weather_data.rename(columns={"date_time": "timestamp"}, inplace=True)
-    weather_data.set_index("timestamp", inplace=True)
-    weather_data.index = pd.to_datetime(weather_data.index)
+    weather.rename(columns={"date_time": "timestamp"}, inplace=True)
+    weather.set_index("timestamp", inplace=True)
+    weather.index = pd.to_datetime(weather.index)
 
-    weather_data = weather_data[
-        ["Dry Bulb Temperature [°C]", "Direct Normal Radiation [W/m2]"]
-    ]
-    weather_data.rename(
-        columns={"Dry Bulb Temperature [°C]": "temperature"}, inplace=True
-    )
+    weather = weather[["Dry Bulb Temperature [°C]", "Direct Normal Radiation [W/m2]"]]
+    weather.rename(columns={"Dry Bulb Temperature [°C]": "temperature"}, inplace=True)
 
     new_row = pd.DataFrame(
-        {"temperature": weather_data.iloc[0]["temperature"]},
+        {"temperature": weather.iloc[0]["temperature"]},
         index=[pd.to_datetime("2018-01-01 00:00:00")],
     )
-    weather_data = pd.concat([new_row, weather_data])
+    weather = pd.concat([new_row, weather])
 
     return weather
 

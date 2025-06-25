@@ -5,7 +5,7 @@ import numpy as np
 from typing import Dict, List, Tuple
 from torch.utils.data import Dataset
 
-from dataset import MLPDataset
+from dataset import Dataset
 
 COLUMNS_PROCESSED = [
     "in.bedrooms_processed",  # int
@@ -56,7 +56,7 @@ def train_test_split(
     y_train, y_test = y[:-num_test_samples], y[-num_test_samples:]
 
     if model == "mlp":
-        return MLPDataset((X_train, y_train)), MLPDataset((X_test, y_test))
+        return Dataset((X_train, y_train)), Dataset((X_test, y_test))
     else:
         raise ValueError(f"Model {model} is not supported")
 

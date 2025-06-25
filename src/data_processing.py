@@ -3,6 +3,9 @@ import os
 import re
 import numpy as np
 from typing import Dict, List, Tuple
+from torch.utils.data import Dataset
+
+from dataset import MLPDataset
 
 COLUMNS_PROCESSED = [
     "in.bedrooms_processed",  # int
@@ -27,6 +30,35 @@ COLUMNS_PROCESSED = [
     "in.window_areas_processed",
     "in.vintage_processed",
 ]
+
+
+def train_test_split(
+    windows: Tuple[np.ndarray, np.ndarray], test_size: float = 0.2, model: str = "mlp"
+) -> Tuple[Dataset, Dataset]:
+    """Split the dataset into training and testing sets.
+
+    Args:
+        windows (Tuple[np.ndarray, np.ndarray]): A tuple containing the features and labels.
+            The first element is a 2D array of features, and the second element is a 1D array of labels.
+        test_size (float, optional): Proportion of the dataset to include in the test split. Defaults to 0.2.
+        model (str, optional): Determines the type of dataset to return. Defaults to "mlp".
+
+    Returns:
+        Tuple[Dataset, Dataset]: A tuple containing the training and testing datasets.
+    """
+    X, y = windows
+
+    # Calculate the number of test samples
+    num_test_samples = int(len(X) * test_size)
+
+    # Split the data into training and testing sets
+    X_train, X_test = X[:-num_test_samples], X[-num_test_samples:]
+    y_train, y_test = y[:-num_test_samples], y[-num_test_samples:]
+
+    if model == "mlp":
+        return MLPDataset((X_train, y_train)), MLPDataset((X_test, y_test))
+    else:
+        raise ValueError(f"Model {model} is not supported")
 
 
 def get_cols(building_data: pd.DataFrame, building_id: int) -> str:

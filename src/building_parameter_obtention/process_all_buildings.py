@@ -140,8 +140,8 @@ def get_train_and_test_datasets(
 
 def main():
 
-    resstock = pd.read_csv(
-        "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/resstock.csv"
+    resstock = pd.read_parquet(
+        "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/resstock.parquet"
     )
 
     weather = pd.read_csv(

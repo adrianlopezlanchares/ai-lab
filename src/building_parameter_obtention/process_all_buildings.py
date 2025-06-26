@@ -39,50 +39,64 @@ def main():
     parameters = {}
     building_data_path = "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_data"
     for file in os.listdir(building_data_path):
-        print(
-            f"Processing file {i}/{len(os.listdir(building_data_path))}           ",
-            end="\r",
-        )
-        i += 1
-
-        if file.endswith(".parquet"):
-            bldg_id = int(file.split("/")[-1].split(".")[0].split("-")[0])
-            building_data = pd.read_parquet(os.path.join(building_data_path, file))
-
-            train_data, train_labels, _, _ = get_train_and_test_datasets(
-                building_data, resstock, weather, bldg_id
+        try:
+            i += 1
+            print(
+                f"Processing file {i}/{len(os.listdir(building_data_path))}           ",
+                end="\r",
             )
 
-            train_dataset = Dataset(train_data, train_labels)
+            if file.endswith(".parquet"):
+                bldg_id = int(file.split("/")[-1].split(".")[0].split("-")[0])
+                building_data = pd.read_parquet(os.path.join(building_data_path, file))
 
-            batch_size = 32
+                train_data, train_labels, _, _ = get_train_and_test_datasets(
+                    building_data, resstock, weather, bldg_id
+                )
 
-            train_loader = DataLoader(
-                train_dataset, batch_size=batch_size, shuffle=True
+                train_dataset = Dataset(train_data, train_labels)
+
+                batch_size = 32
+
+                train_loader = DataLoader(
+                    train_dataset, batch_size=batch_size, shuffle=True
+                )
+
+                model = LinearRegressionModel(
+                    input_size=train_data.shape[1], output_size=1, bias=False
+                )
+
+                criterion = torch.nn.MSELoss()
+                optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+
+                num_epochs = 100
+                train(model, train_loader, criterion, optimizer, num_epochs)
+
+                # Get parameters
+                building_params = []
+                for param in model.parameters():
+                    for num in param:
+                        try:
+                            for p in num:
+                                building_params.append(p.item())
+                        except:
+                            building_params.append(num.item())
+
+                parameters[bldg_id] = building_params
+        except "KeyboardInterrupt":
+            print(f"Saving progress... bldg_id: {bldg_id}, iteration: {i}")
+            parameters_df = pd.DataFrame.from_dict(parameters, orient="index")
+            parameters_df.reset_index(inplace=True)
+            parameters_df.rename(columns={"index": "building_id"}, inplace=True)
+            # Drop column named Unnamed: 0
+            if "Unnamed: 0" in parameters_df.columns:
+                parameters_df.drop(columns=["Unnamed: 0"], inplace=True)
+            parameters_df.to_csv(
+                f"/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_parameters_{i}.csv",
+                index=True,
             )
 
-            model = LinearRegressionModel(
-                input_size=train_data.shape[1], output_size=1, bias=False
-            )
-
-            criterion = torch.nn.MSELoss()
-            optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
-
-            num_epochs = 100
-            train(model, train_loader, criterion, optimizer, num_epochs)
-
-            # Get parameters
-            building_params = []
-            for param in model.parameters():
-                for num in param:
-                    try:
-                        for p in num:
-                            building_params.append(p.item())
-                    except:
-                        building_params.append(num.item())
-
-            parameters[bldg_id] = building_params
-
+    print("Finished.")
     parameters_df = pd.DataFrame.from_dict(parameters, orient="index")
     parameters_df.reset_index(inplace=True)
     parameters_df.rename(columns={"index": "building_id"}, inplace=True)

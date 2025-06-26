@@ -27,8 +27,8 @@ def train(
         verbose (bool, optional): If True, prints training progress. Defaults to False.
     """
     model.train()
+    step = 0
     for epoch in range(num_epochs):
-        i = 0
         for sequences, labels in train_loader:
             sequences, labels = sequences.to(device), labels.to(device)
 
@@ -46,11 +46,11 @@ def train(
             if writer:
                 writer.add_scalar("Loss/train", loss.item(), epoch)
 
-            if verbose and i % 100 == 0:
+            if verbose:
                 print(
-                    f"Epoch [{epoch + 1}/{num_epochs}], Step [{i + 1}/{len(train_loader)}], Loss: {loss.item():.4f}"
+                    f"Epoch {epoch + 1}/{num_epochs}, Step {step + 1}/{len(train_loader)}       ",
+                    end="\r",
                 )
-            i += 1
 
 
 def evaluate(

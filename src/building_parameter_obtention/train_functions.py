@@ -19,3 +19,17 @@ def train(model, train_loader, criterion, optimizer, num_epochs):
             optimizer.step()
 
             running_loss += loss.item()
+
+
+def evaluate(model, test_loader, criterion, device="cpu"):
+    model.eval()
+    total_loss = 0.0
+    predictions = []
+    with torch.no_grad():
+        for sequences, labels in test_loader:
+            sequences, labels = sequences.to(device), labels.to(device)
+            outputs = model(sequences).squeeze()
+            predictions.extend(outputs.cpu().numpy().tolist())
+            loss = criterion(outputs, labels)
+            total_loss += loss.item()
+    return predictions, total_loss / len(test_loader)  # Average loss over the test set

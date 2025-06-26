@@ -1,22 +1,27 @@
-import os
-import sys
 import pandas as pd
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-
 from typing import List, Tuple
 
-from data_processing import (
+import sys
+import os
+
+# Adds the project root to sys.path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from src.utils.data_processing import (
     get_cols,
     process_weather_data,
     get_consumption_timeseries,
     get_train_and_test_datasets,
 )
-from dataset import Dataset
-from models import LinearRegressionModel
-from train_functions import train
+from src.utils.dataset import Dataset
+from src.utils.models import LinearRegressionModel
+from src.utils.train_functions import train
 
 import warnings
 
@@ -36,7 +41,7 @@ def main():
     weather = process_weather_data(weather)
 
     i = 0
-    start = 55
+    start = 2090
     parameters = {}
     building_data_path = "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_data"
     for file in os.listdir(building_data_path):

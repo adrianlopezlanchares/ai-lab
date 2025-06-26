@@ -32,6 +32,34 @@ COLUMNS_PROCESSED = [
 ]
 
 
+def create_train_and_test_datasets(
+    features: pd.DataFrame, labels: pd.DataFrame, test_size: float = 0.2
+) -> Tuple[Dataset, Dataset]:
+    """Creates a dataset for training and testing.
+
+    Args:
+        features (pd.DataFrame): DataFrame containing the input features.
+        labels (pd.DataFrame): DataFrame containing the target labels.
+        test_size (float): Proportion of the dataset to include in the test split. Default is 0.2.
+
+    Returns:
+        Tuple[Dataset, Dataset]: A tuple containing the training and testing datasets.
+    """
+    features = features.to_numpy()
+    labels = labels.to_numpy()
+
+    train_features = features[: int(len(features) * (1 - test_size))]
+    train_labels = labels[: int(len(labels) * (1 - test_size))]
+
+    test_features = features[int(len(features) * (1 - test_size)) :]
+    test_labels = labels[int(len(labels) * (1 - test_size)) :]
+
+    train_dataset = Dataset(train_features, train_labels)
+    test_dataset = Dataset(test_features, test_labels)
+
+    return train_dataset, test_dataset
+
+
 def process_weather_data(weather: pd.DataFrame) -> pd.DataFrame:
     """
     Processes the weather data to extract relevant features.

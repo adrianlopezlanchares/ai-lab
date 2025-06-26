@@ -5,7 +5,7 @@ import numpy as np
 from typing import Dict, List, Tuple
 from torch.utils.data import Dataset
 
-from dataset import Dataset
+from src.utils.dataset import Dataset
 
 COLUMNS_PROCESSED = [
     "in.bedrooms_processed",  # int

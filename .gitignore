@@ -1,6 +1,9 @@
 /.env
 /data
 **/__pycache__/
+/runs
+/models
+/optuna
 
 .DS_Store
 pruebas.ipynb

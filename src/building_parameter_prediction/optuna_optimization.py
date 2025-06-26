@@ -87,23 +87,13 @@ def objective(trial: optuna.Trial) -> float:
 
 
 if __name__ == "__main__":
-    # Create an Optuna study
-    study = optuna.create_study(direction="minimize")
+    study = optuna.create_study(
+        direction="minimize",
+        storage="sqlite:///optuna/parameter_prediction_study.db",
+        load_if_exists=True,
+    )
 
-    # Optimize the objective function
     study.optimize(objective, n_trials=50)
 
-    # Print the best hyperparameters and the corresponding loss
     print("Best hyperparameters:", study.best_params)
     print("Best validation loss:", study.best_value)
-
-    # Save the best model
-    best_model = MLP(
-        input_size=train_dataset.data.shape[1],
-        hidden_layers=[
-            study.best_params[f"hidden_layer_{i}_size"]
-            for i in range(study.best_params["hidden_layers"])
-        ],
-        output_size=5,
-    )
-    torch.save(best_model.state_dict(), "models/best_parameter_prediction_model.pth")

@@ -83,7 +83,8 @@ def main():
                             building_params.append(num.item())
 
                 parameters[bldg_id] = building_params
-        except "KeyboardInterrupt":
+        # Raise exception keyboardinterrupt
+        except KeyboardInterrupt:
             print(f"Saving progress... bldg_id: {bldg_id}, iteration: {i}")
             parameters_df = pd.DataFrame.from_dict(parameters, orient="index")
             parameters_df.reset_index(inplace=True)

@@ -32,6 +32,130 @@ COLUMNS_PROCESSED = [
 ]
 
 
+def process_weather_data(weather: pd.DataFrame) -> pd.DataFrame:
+    """
+    Processes the weather data to extract relevant features.
+
+    Args:
+        weather (pd.DataFrame): The raw weather data.
+
+    Returns:
+        pd.DataFrame: Processed weather data with relevant features.
+    """
+    weather.rename(columns={"date_time": "timestamp"}, inplace=True)
+    weather.set_index("timestamp", inplace=True)
+    weather.index = pd.to_datetime(weather.index)
+
+    weather = weather[["Dry Bulb Temperature [°C]", "Direct Normal Radiation [W/m2]"]]
+    weather.rename(columns={"Dry Bulb Temperature [°C]": "temperature"}, inplace=True)
+
+    new_row = pd.DataFrame(
+        {"temperature": weather.iloc[0]["temperature"]},
+        index=[pd.to_datetime("2018-01-01 00:00:00")],
+    )
+    weather = pd.concat([new_row, weather])
+
+    return weather
+
+
+def get_consumption_timeseries(
+    resstock: pd.DataFrame, building_data: pd.DataFrame, building_id: str
+) -> pd.DataFrame:
+    """Gets the consumption timeseries for a specific building.
+
+    Args:
+        resstock (pd.DataFrame): Resstock data containing building information.
+        building_data (pd.DataFrame): DataFrame containing building-specific data.
+        building_id (str): The ID of the building for which to retrieve the timeseries.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the consumption timeseries for the specified building.
+    """
+    col_to_use = get_cols(resstock, building_id)
+    consumption_timeseries = building_data[["timestamp", col_to_use]]
+
+    consumption_timeseries["timestamp"] = pd.to_datetime(
+        consumption_timeseries["timestamp"]
+    )
+    consumption_timeseries.set_index("timestamp", inplace=True)
+    consumption_timeseries = consumption_timeseries.resample("H").mean()
+    consumption_timeseries = consumption_timeseries[col_to_use]
+
+    consumption_timeseries = pd.DataFrame(consumption_timeseries)
+    consumption_timeseries.rename(columns={col_to_use: "consumption"}, inplace=True)
+
+    return consumption_timeseries
+
+
+def get_train_and_test_datasets(
+    building_data: pd.DataFrame,
+    resstock: pd.DataFrame,
+    weather: pd.DataFrame,
+    bldg_id: str,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Gets the training and testing data for the MLP model.
+
+    Args:
+        building_data (pd.DataFrame): DataFrame containing building-specific data.
+        resstock (pd.DataFrame): Resstock data containing building information.
+        weather (pd.DataFrame): DataFrame containing weather data.
+        bldg_id (str): The ID of the building for which to retrieve the data.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: A tuple containing the training data, training labels,
+        testing data, and testing labels.
+    """
+    temp_timeseries = building_data[
+        ["timestamp", "out.zone_mean_air_temp.conditioned_space.c"]
+    ].copy()
+
+    # Rename columns for clarity
+    temp_timeseries.columns = ["timestamp", "indoor_temp"]
+
+    consumption_timeseries = get_consumption_timeseries(
+        resstock, building_data, bldg_id
+    )
+
+    exog_variables = exog_variables = pd.merge(
+        consumption_timeseries,
+        weather,
+        left_index=True,
+        right_index=True,
+    )
+
+    train_size = 0.8
+
+    endog_train = temp_timeseries[: int(train_size * len(temp_timeseries))]
+    endog_test = temp_timeseries[int(train_size * len(temp_timeseries)) :]
+
+    exog_train = exog_variables[: int(train_size * len(exog_variables))]
+    exog_test = exog_variables[int(train_size * len(exog_variables)) :]
+
+    endog_train.set_index("timestamp", inplace=True)
+    endog_test.set_index("timestamp", inplace=True)
+
+    train_data = pd.merge(endog_train, exog_train, left_index=True, right_index=True)
+    test_data = pd.merge(endog_test, exog_test, left_index=True, right_index=True)
+
+    train_labels = train_data["indoor_temp"].values
+    test_labels = test_data["indoor_temp"].values
+
+    # Shift setpoint so that each column has the value of the previous hour
+    train_data["indoor_temp"] = train_data["indoor_temp"].shift(1)
+    test_data["indoor_temp"] = test_data["indoor_temp"].shift(1)
+
+    # Create new lag_temperature column with lag 1
+    train_data["lag_temperature"] = train_data["temperature"].shift(1)
+    test_data["lag_temperature"] = test_data["temperature"].shift(1)
+
+    train_data.ffill(inplace=True)
+    test_data.ffill(inplace=True)
+    train_data.bfill(inplace=True)
+    test_data.bfill(inplace=True)
+
+    return train_data.values, train_labels, test_data.values, test_labels
+
+
 def train_test_split(
     windows: Tuple[np.ndarray, np.ndarray], test_size: float = 0.2, model: str = "mlp"
 ) -> Tuple[Dataset, Dataset]:

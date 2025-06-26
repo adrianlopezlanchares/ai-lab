@@ -5,14 +5,6 @@ from torch.utils.data import DataLoader
 
 from typing import List, Tuple
 
-import sys
-import os
-
-# Adds the project root to sys.path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
 from src.utils.data_processing import (
     get_cols,
     process_weather_data,
@@ -41,7 +33,7 @@ def main():
     weather = process_weather_data(weather)
 
     i = 0
-    start = 2090
+    start = 4196
     parameters = {}
     building_data_path = "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_data"
     for file in os.listdir(building_data_path):
@@ -79,7 +71,14 @@ def main():
                 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
                 num_epochs = 100
-                train(model, train_loader, criterion, optimizer, num_epochs)
+                train(
+                    model,
+                    train_loader,
+                    criterion,
+                    optimizer,
+                    num_epochs,
+                    device=torch.device("cpu"),
+                )
 
                 # Get parameters
                 building_params = []

@@ -85,6 +85,7 @@ def main():
                 parameters[bldg_id] = building_params
         # Raise exception keyboardinterrupt
         except KeyboardInterrupt:
+            print("\n")
             print(f"Saving progress... bldg_id: {bldg_id}, iteration: {i}")
             parameters_df = pd.DataFrame.from_dict(parameters, orient="index")
             parameters_df.reset_index(inplace=True)
@@ -93,9 +94,11 @@ def main():
             if "Unnamed: 0" in parameters_df.columns:
                 parameters_df.drop(columns=["Unnamed: 0"], inplace=True)
             parameters_df.to_csv(
-                f"/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_parameters_{i}.csv",
+                f"/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_parameters_{i-1}.csv",
                 index=True,
             )
+            # stop program
+            sys.exit(0)
 
     print("Finished.")
     parameters_df = pd.DataFrame.from_dict(parameters, orient="index")
@@ -104,6 +107,14 @@ def main():
     # Drop column named Unnamed: 0
     if "Unnamed: 0" in parameters_df.columns:
         parameters_df.drop(columns=["Unnamed: 0"], inplace=True)
+    parameters_df.columns = [
+        "building_id",
+        "indoor_temp_param",
+        "consumption_param",
+        "ambient_temp_param",
+        "direct_solar_radiation_param",
+        "ambient_temp_lag_param",
+    ]
     parameters_df.to_csv(
         "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_parameters.csv",
         index=True,

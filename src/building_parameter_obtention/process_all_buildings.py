@@ -86,6 +86,9 @@ def main():
     parameters_df = pd.DataFrame.from_dict(parameters, orient="index")
     parameters_df.reset_index(inplace=True)
     parameters_df.rename(columns={"index": "building_id"}, inplace=True)
+    # Drop column named Unnamed: 0
+    if "Unnamed: 0" in parameters_df.columns:
+        parameters_df.drop(columns=["Unnamed: 0"], inplace=True)
     parameters_df.to_csv(
         "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_parameters.csv",
         index=True,

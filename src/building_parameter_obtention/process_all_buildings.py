@@ -206,8 +206,6 @@ def main():
 
             parameters[bldg_id] = building_params
 
-    # Save parameters to a CSV file
-    # Shape of parameters: {building_id: [param1, param2, ...]}
     parameters_df = pd.DataFrame.from_dict(parameters, orient="index")
     parameters_df.reset_index(inplace=True)
     parameters_df.rename(columns={"index": "building_id"}, inplace=True)

@@ -3,6 +3,8 @@ import torch.nn as nn
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 
+from typing import List, Tuple
+
 
 def train(
     model: nn.Module,
@@ -58,7 +60,7 @@ def evaluate(
     test_loader: DataLoader,
     criterion: nn.Module,
     device: torch.device = "cpu",
-):
+) -> float:
     """Evaluates the model on the test dataset.
 
     Args:
@@ -68,18 +70,14 @@ def evaluate(
         device (torch.device, optional): Device to run the evaluation on (CPU or GPU). Defaults to "cpu".
 
     Returns:
-        tuple: A tuple containing:
-            - predictions (list): List of predictions made by the model.
-            - average_loss (float): Average loss over the test set.
+        float: The average loss over the test dataset.
     """
     model.eval()
     total_loss = 0.0
-    predictions = []
     with torch.no_grad():
         for sequences, labels in test_loader:
             sequences, labels = sequences.to(device), labels.to(device)
             outputs = model(sequences).squeeze()
-            predictions.extend(outputs.cpu().numpy().tolist())
             loss = criterion(outputs, labels)
             total_loss += loss.item()
-    return predictions, total_loss / len(test_loader)  # Average loss over the test set
+    return total_loss / len(test_loader)

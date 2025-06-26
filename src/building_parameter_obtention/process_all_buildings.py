@@ -26,11 +26,11 @@ warnings.filterwarnings("ignore")
 def main():
 
     resstock = pd.read_parquet(
-        "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/resstock.parquet"
+        "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/resstock/resstock.parquet"
     )
 
     weather = pd.read_csv(
-        "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/G2500170_2018.csv",
+        "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/weather/G2500170_2018.csv",
     )
 
     weather = process_weather_data(weather)
@@ -106,7 +106,7 @@ def main():
                 "ambient_temp_lag_param",
             ]
             parameters_df.to_csv(
-                f"/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_parameters_{start}_{i-1}.csv",
+                f"/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_parameters/building_parameters_{start}_{i-1}.csv",
                 index=True,
             )
             # stop program
@@ -128,7 +128,7 @@ def main():
         "ambient_temp_lag_param",
     ]
     parameters_df.to_csv(
-        "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_parameters.csv",
+        "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_parameters_building_parameters.csv",
         index=True,
     )
 

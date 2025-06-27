@@ -17,8 +17,8 @@ processed_resstock = pd.read_csv(
 processed_resstock.set_index("bldg_id", inplace=True)
 
 train_dataset, test_dataset = create_train_and_test_datasets(
-    features=building_parameters,
-    labels=processed_resstock,
+    features=processed_resstock,
+    labels=building_parameters,
     test_size=0.2,
 )
 
@@ -44,9 +44,9 @@ def objective(trial: optuna.Trial) -> float:
     ]
 
     # Define set hyperparameters
-    input_size = train_dataset.data.shape[1]
-    output_size = 5
-    device = torch.device("mps" if torch.mps.backends.is_available() else "cpu")
+    input_size = len(processed_resstock.columns)
+    output_size = len(building_parameters.columns)
+    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
     # Create DataLoader
     train_loader = DataLoader(

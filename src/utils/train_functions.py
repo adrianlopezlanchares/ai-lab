@@ -53,6 +53,7 @@ def train(
                     f"Epoch {epoch + 1}/{num_epochs}, Step {step + 1}/{len(train_loader)}       ",
                     end="\r",
                 )
+            step += 1
 
 
 def evaluate(

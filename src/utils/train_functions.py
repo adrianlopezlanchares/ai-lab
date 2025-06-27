@@ -82,3 +82,25 @@ def evaluate(
             loss = criterion(outputs, labels)
             total_loss += loss.item()
     return total_loss / len(test_loader)
+
+
+def predict(
+    model: nn.Module,
+    sequences: torch.Tensor,
+    device: torch.device = "cpu",
+) -> torch.Tensor:
+    """Predicts the output for the given input sequences using the trained model.
+
+    Args:
+        model (nn.Module): The pytorch model to be used for prediction.
+        sequences (torch.Tensor): Input sequences for which predictions are to be made.
+        device (torch.device, optional): Device to run the prediction on (CPU or GPU). Defaults to "cpu".
+
+    Returns:
+        torch.Tensor: Predicted outputs for the input sequences.
+    """
+    model.eval()
+    with torch.no_grad():
+        sequences = sequences.to(device)
+        outputs = model(sequences).squeeze()
+    return outputs

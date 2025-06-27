@@ -107,7 +107,7 @@ def predict(
             outputs = model(sequences).squeeze()
         else:
             outputs = []
-            for batch in sequences:
+            for batch, labels in sequences:
                 batch = batch.to(device)
                 output = model(batch).squeeze()
                 outputs.append(output)

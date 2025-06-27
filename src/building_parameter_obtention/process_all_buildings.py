@@ -35,7 +35,7 @@ def main():
     weather = process_weather_data(weather)
 
     i = 0
-    start = 4196
+    start = 8209
     parameters = {}
     building_data_path = "/Users/cocoloco/Library/Mobile Documents/com~apple~CloudDocs/Documents/ICAI/4o/AI Lab/data/building_data"
     for file in os.listdir(building_data_path):

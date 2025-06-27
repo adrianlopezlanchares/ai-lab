@@ -17,8 +17,8 @@ processed_resstock = pd.read_csv(
 processed_resstock.set_index("bldg_id", inplace=True)
 
 train_dataset, test_dataset = create_train_and_test_datasets(
-    building_parameters=building_parameters,
-    processed_resstock=processed_resstock,
+    features=building_parameters,
+    labels=processed_resstock,
     test_size=0.2,
 )
 

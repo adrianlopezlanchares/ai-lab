@@ -32,7 +32,7 @@ COLUMNS_PROCESSED = [
 ]
 
 
-def create_train_and_test_datasets(
+def create_mlp_train_and_test_datasets(
     features: pd.DataFrame, labels: pd.DataFrame, test_size: float = 0.2
 ) -> Tuple[Dataset, Dataset]:
     """Creates a dataset for training and testing.
@@ -115,13 +115,13 @@ def get_consumption_timeseries(
     return consumption_timeseries
 
 
-def get_train_and_test_datasets(
+def create_lr_train_and_test_datasets(
     building_data: pd.DataFrame,
     resstock: pd.DataFrame,
     weather: pd.DataFrame,
     bldg_id: str,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Gets the training and testing data for the MLP model.
+    """Gets the training and testing data for the Linear Regression model.
 
     Args:
         building_data (pd.DataFrame): DataFrame containing building-specific data.

@@ -11,7 +11,7 @@ from src.utils.data_processing import (
     get_cols,
     process_weather_data,
     get_consumption_timeseries,
-    get_train_and_test_datasets,
+    create_lr_train_and_test_datasets,
 )
 from src.utils.dataset import Dataset
 from src.utils.models import LinearRegressionModel
@@ -53,7 +53,7 @@ def main():
                 bldg_id = int(file.split("/")[-1].split(".")[0].split("-")[0])
                 building_data = pd.read_parquet(os.path.join(building_data_path, file))
 
-                train_data, train_labels, _, _ = get_train_and_test_datasets(
+                train_data, train_labels, _, _ = create_lr_train_and_test_datasets(
                     building_data, resstock, weather, bldg_id
                 )
 

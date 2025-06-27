@@ -86,14 +86,15 @@ def evaluate(
 
 def predict(
     model: nn.Module,
-    sequences: torch.Tensor,
+    sequences: torch.Tensor | DataLoader,
     device: torch.device = "cpu",
 ) -> torch.Tensor:
     """Predicts the output for the given input sequences using the trained model.
 
     Args:
         model (nn.Module): The pytorch model to be used for prediction.
-        sequences (torch.Tensor): Input sequences for which predictions are to be made.
+        sequences (torch.Tensor | DataLoader): Input sequences for which predictions are to be made.
+                                               If a DataLoader is provided, it should yield batches of sequences.
         device (torch.device, optional): Device to run the prediction on (CPU or GPU). Defaults to "cpu".
 
     Returns:
@@ -101,6 +102,14 @@ def predict(
     """
     model.eval()
     with torch.no_grad():
-        sequences = sequences.to(device)
-        outputs = model(sequences).squeeze()
+        if isinstance(sequences, torch.Tensor):
+            sequences = sequences.to(device)
+            outputs = model(sequences).squeeze()
+        else:
+            outputs = []
+            for batch in sequences:
+                batch = batch.to(device)
+                output = model(batch).squeeze()
+                outputs.append(output)
+            outputs = torch.cat(outputs, dim=0)
     return outputs

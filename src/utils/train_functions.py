@@ -29,8 +29,8 @@ def train(
         verbose (bool, optional): If True, prints training progress. Defaults to False.
     """
     model.train()
-    step = 0
     for epoch in range(num_epochs):
+        step = 0
         for sequences, labels in train_loader:
             sequences, labels = sequences.to(device), labels.to(device)
 
